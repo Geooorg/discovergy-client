@@ -14,7 +14,7 @@ Secondly, you can easily integrate the PHP script on your own low-cost website o
 
 # Usage
 ## API access
-Accessing the API is (unfortunately!) only possible using your login credentials you get for the Discovergy portal.
+Accessing the API is (unfortunately!) possible only using your login credentials you get for the Discovergy web portal.
 
 Create a file named `credentials` next to the PHP files. 
 Line one needs to contain your username, line two your password. That's it.
@@ -32,21 +32,28 @@ The script is called by running `main.php`.
 At the time of writing, only the first smart meter is considered: 
 
     $meters = $client->getMeters(); 
-        
-        
-In order to fit the results, you need to pass the timestamps in microseconds to most API calls.
+    
+Using `getReadings` allows you to retrieve the energy values within a certain range given as UNIX timestamp in milliseconds (see below).
+Note that the API is limited to 200 values (if I remember correctly) per call. 
+So if you want to get more values, you either need to repeat the call for the following time range.
+Or consider to use Discovergy's export function in the portal. I haven't tried that out so far but I assume that the data will be returned as CSV.                       
 
 # Units
 
 * Timestamps are interpreted by Discovergy in *micro*seconds after 1.1.1970 and time zone is UTC
 * The energy consumption/production unit is given in mW (Milli Watt). So a value of 50600 means 50,6 Watts.
 * The method `getReadings` has a default argument `$resolution='three_minutes'`. If you need more precise values, pass `'raw'` as argument (see the API docs for further values).
-* If negative a Watt measurement means 'energy produced', otherwise it's consumed (taken from the power grid)
+* A negative Watt measurement means 'energy produced', otherwise it's consumed (taken from the power grid)
 * By default all responses are output in JSON
     
 # Example output
 
-    $energyProduced = $client->getReadings($meterId, $fieldPower, 1603551620000, 1603552320000);
+The output shown below refers to the energy consumption from Oct.25th 2020 at about 17:12h local time, when it was pretty cloudy ;-)
+
+![Image of energy diagram](sample_diagram.png)
+
+
+    $energyProduced = $client->getReadings($meterId, $fieldPower, 1603551620000, 1603552320000, 'raw');
 
 ... results in ...
  
@@ -154,7 +161,8 @@ In order to fit the results, you need to pass the timestamps in microseconds to 
         }
       }
     ]
+    
+# Contact
 
-![Image of energy diagram](sample_diagram.png)
-
-The values refer to the energy consumption from Oct.25 2020 at about 17:12h local time, when it was pretty cloudy ;-)
+Pull requests and improvements are welcome anytime.
+See my homepage (https://GeorgStach.de) for contact options.    
